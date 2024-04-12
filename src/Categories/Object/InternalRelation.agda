@@ -147,7 +147,8 @@ record Preorder (X : 𝒞.Obj) : Set (suc (o ⊔ ℓ ⊔ e)) where
 
 module _ where
   open Pullback hiding (P)
-  open 𝒞.Equiv renaming (refl to ≈-refl; trans to ≈-trans)
+  private
+    module 𝒞≈ = 𝒞.Equiv
 
   -- from an internal preorder we can obtain an external one
   IP⇒EP : {X : 𝒞.Obj} (ipreorder : Preorder X) → ExternallyPreordered 𝒞 X
@@ -167,15 +168,15 @@ module _ where
                                    x               ≈⟨ eq ⟩
                                    y               ∎) }
                ; trans = λ { {i} {j} {k} (l , eqi , eqj₁) (r , eqj₂ , eqk) →
-                             trans ∘ universal R×R {_} {r} {l} (≈-trans eqj₂ (sym eqj₁))
+                             trans ∘ universal R×R {_} {r} {l} (𝒞≈.trans eqj₂ (𝒞≈.sym eqj₁))
                            , (begin
                                R.p₁ ∘ trans ∘ R×R.universal _    ≈⟨ pullˡ is-trans₁ ⟩
-                               (R.p₁ ∘ R×R.p₂) ∘ R×R.universal _ ≈⟨ sym (pushʳ (sym (p₂∘universal≈h₂ R×R))) ⟩
+                               (R.p₁ ∘ R×R.p₂) ∘ R×R.universal _ ≈⟨ pullʳ (p₂∘universal≈h₂ R×R) ⟩
                                R.p₁ ∘ l                          ≈⟨ eqi ⟩
                                i                                 ∎)
                            , (begin
                                R.p₂ ∘ trans ∘ R×R.universal _    ≈⟨ pullˡ is-trans₂ ⟩
-                               (R.p₂ ∘ R×R.p₁) ∘ R×R.universal _ ≈⟨ sym (pushʳ (sym (p₁∘universal≈h₁ R×R))) ⟩
+                               (R.p₂ ∘ R×R.p₁) ∘ R×R.universal _ ≈⟨ pullʳ (p₁∘universal≈h₁ R×R) ⟩
                                R.p₂ ∘ r                          ≈⟨ eqk ⟩
                                k                                 ∎) }
                }
