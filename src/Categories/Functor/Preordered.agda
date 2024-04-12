@@ -26,11 +26,12 @@ module _  (C : Category o ℓ e) (D : Category o′ ℓ′ e′) where
     field
       preord : ∀ X → Preordered D (F₀ X)
 
-    [_,_]_⊑_ : (A : Obj) (X : C.Obj) → Rel (A ⇒ F₀ X) (ℓ′ ⊔ e′)
-    [ A , X ] f ⊑ g = Preordered._⊑_ (preord X) f g
+    infix 4 _⊑_
+    _⊑_ : {A : Obj} {X : C.Obj} → Rel (A ⇒ F₀ X) (ℓ′ ⊔ e′)
+    _⊑_ {A} {X} f g = Preordered._⊑_ (preord X) f g
 
     field
-      F-resp-⊑ : ∀ {A B C} {f : A C.⇒ B} {g h : C ⇒ F₀ A} → [ C , A ] g ⊑ h → [ C , B ] F₁ f ∘ g ⊑ (F₁ f ∘ h)
+      F-resp-⊑ : ∀ {A B C} {f : A C.⇒ B} {g h : C ⇒ F₀ A} → g ⊑ h → F₁ f ∘ g ⊑ F₁ f ∘ h
 
   -- preordered functor
   record PreorderedFunctor : Set (levelOfTerm C ⊔ levelOfTerm D) where
