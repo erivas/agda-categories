@@ -18,11 +18,11 @@ open import Categories.Category.Construction.Kleisli
 
 private
   variable
-    o ℓ e : Level
+    o ℓ e i : Level
 
 -- preorder on a monad
 
-record Preorder {C : Category o ℓ e} (M : Monad C) : Set (suc (o ⊔ ℓ ⊔ e)) where
+record Preorder {C : Category o ℓ e} (M : Monad C) : Set (o ⊔ ℓ ⊔ e ⊔ suc i) where
   open Category C
   private
     module M = Monad M
@@ -31,23 +31,23 @@ record Preorder {C : Category o ℓ e} (M : Monad C) : Set (suc (o ⊔ ℓ ⊔ e
   open NaturalTransformation M.μ renaming (η to μ)
   open Functor F
   field
-    hasPreorder : HasPreorder _ _ F
+    hasPreorder : HasPreorder {i = i} _ _ F
   open HasPreorder hasPreorder public
 
   field
     μ-⊑ : ∀ {A B} {f g : A ⇒ F₀ (F₀ B)} → f ⊑ g → μ _ ∘ f ⊑ μ _ ∘ g
     μ-F-⊑ : ∀ {A B} {f g : A ⇒ F₀ B} → f ⊑ g → μ _ ∘ F₁ f ⊑ μ _ ∘ F₁ g
 
-record PreorderedMonad {C : Category o ℓ e} : Set (suc (o ⊔ ℓ ⊔ e)) where
+record PreorderedMonad {C : Category o ℓ e} : Set (o ⊔ ℓ ⊔ e ⊔ suc i) where
   field
     M        : Monad C
-    preorder : Preorder M
+    preorder : Preorder {i = i} M
 
   module M = Monad M
   open Preorder preorder public
 
 
-module _ {C : Category o ℓ e} (PM : PreorderedMonad {C = C}) where
+module _ {C : Category o ℓ e} (PM : PreorderedMonad {i = i} {C = C}) where
   open Category C
   open PreorderedMonad PM
   private

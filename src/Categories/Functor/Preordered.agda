@@ -14,20 +14,20 @@ private
   variable
     o o′ ℓ ℓ′ e e′ : Level
 
-module _  (C : Category o ℓ e) (D : Category o′ ℓ′ e′) where
+module _ {i} (C : Category o ℓ e) (D : Category o′ ℓ′ e′) where
   private
     module C = Category C
     module D = Category D
   open D
 
-  record HasPreorder (F : Functor C D) : Set (levelOfTerm C ⊔ levelOfTerm D) where
+  record HasPreorder (F : Functor C D) : Set (o ⊔ ℓ ⊔ o′ ⊔ ℓ′ ⊔ e′ ⊔ suc i) where
     open Functor F
 
     field
-      preord : ∀ X → Preordered D (F₀ X)
+      preord : ∀ X → Preordered {i = i} D (F₀ X)
 
     infix 4 _⊑_
-    _⊑_ : {A : Obj} {X : C.Obj} → Rel (A ⇒ F₀ X) (ℓ′ ⊔ e′)
+    _⊑_ : {A : Obj} {X : C.Obj} → Rel (A ⇒ F₀ X) i
     _⊑_ {A} {X} f g = Preordered._⊑_ (preord X) f g
 
     isPreorder : {A : Obj} {X : C.Obj} → IsPreorder (_≈_ {A} {F₀ X}) (_⊑_ {A} {X})
@@ -40,7 +40,7 @@ module _  (C : Category o ℓ e) (D : Category o′ ℓ′ e′) where
       F-resp-⊑ : ∀ {A B C} {f : A C.⇒ B} {g h : C ⇒ F₀ A} → g ⊑ h → F₁ f ∘ g ⊑ F₁ f ∘ h
 
   -- preordered functor
-  record PreorderedFunctor : Set (levelOfTerm C ⊔ levelOfTerm D) where
+  record PreorderedFunctor : Set (o ⊔ ℓ ⊔ e ⊔ o′ ⊔ ℓ′ ⊔ e′ ⊔ suc i) where
     field
       F : Functor C D
       hasPreorder : HasPreorder F

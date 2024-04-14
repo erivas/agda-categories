@@ -151,10 +151,10 @@ module _ where
     module 𝒞≈ = 𝒞.Equiv
 
   -- from an internal preorder we can obtain an external one
-  IP⇒EP : {X : 𝒞.Obj} (ipreorder : Preorder X) → ExternallyPreordered 𝒞 X
+  IP⇒EP : {X : 𝒞.Obj} (ipreorder : Preorder X) → ExternallyPreordered {i = ℓ ⊔ e} 𝒞 X
   IP⇒EP {X} ip = record
     { _⊑_ = λ {A} f g → ∃ (λ p → R.p₁ ∘ p ≈ f × R.p₂ ∘ p ≈ g)
-    ; preorder = record
+    ; isPreorder = record
                { isEquivalence = equiv
                ; reflexive = λ { {x} {y} eq →
                                  refl ∘ x
