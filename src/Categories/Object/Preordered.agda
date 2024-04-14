@@ -16,10 +16,10 @@ private
 open Category 𝒞
 
 -- "Externally" preordered object
-record Preordered (X : 𝒞.Obj) : Set (suc (o ⊔ ℓ ⊔ e)) where
+record Preordered (X : Obj) : Set (suc (o ⊔ ℓ ⊔ e)) where
   infix 4 _⊑_
   field
     _⊑_ : ∀ {A} → Rel (A ⇒ X) (ℓ ⊔ e)
   field
-    preorder : ∀ {A} → IsPreorder (_≈_ {A} {X}) (_⊑_ {A})
+    isPreorder : ∀ {A} → IsPreorder (_≈_ {A} {X}) (_⊑_ {A})
     ∘-resp-⊑ : ∀ {A B} {f : A ⇒ B} {g h : B ⇒ X} → g ⊑ h → g ∘ f ⊑ h ∘ f

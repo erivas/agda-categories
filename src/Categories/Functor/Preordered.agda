@@ -30,6 +30,12 @@ module _  (C : Category o ℓ e) (D : Category o′ ℓ′ e′) where
     _⊑_ : {A : Obj} {X : C.Obj} → Rel (A ⇒ F₀ X) (ℓ′ ⊔ e′)
     _⊑_ {A} {X} f g = Preordered._⊑_ (preord X) f g
 
+    isPreorder : {A : Obj} {X : C.Obj} → IsPreorder (_≈_ {A} {F₀ X}) (_⊑_ {A} {X})
+    isPreorder {A} {X} = Preordered.isPreorder (preord X)
+
+    ∘-resp-⊑ : ∀ {A B X} {f : A ⇒ B} {g h : B ⇒ F₀ X} → g ⊑ h → g ∘ f ⊑ h ∘ f
+    ∘-resp-⊑ {A} {B} {X} {f} {g} {h} ineq = Preordered.∘-resp-⊑ (preord X) ineq
+
     field
       F-resp-⊑ : ∀ {A B C} {f : A C.⇒ B} {g h : C ⇒ F₀ A} → g ⊑ h → F₁ f ∘ g ⊑ F₁ f ∘ h
 
