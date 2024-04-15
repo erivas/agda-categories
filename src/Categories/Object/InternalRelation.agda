@@ -154,9 +154,7 @@ module _ where
   IP⇒EP : {X : 𝒞.Obj} (ipreorder : Preorder X) → ExternallyPreordered {i = ℓ ⊔ e} 𝒞 X
   IP⇒EP {X} ip = record
     { _⊑_ = λ {A} f g → ∃ (λ p → R.p₁ ∘ p ≈ f × R.p₂ ∘ p ≈ g)
-    ; isPreorder = record
-               { isEquivalence = equiv
-               ; reflexive = λ { {x} {y} eq →
+    ; reflexive = λ { {_} {x} {y} eq →
                                  refl ∘ x
                                , (begin
                                    R.p₁ ∘ refl ∘ x ≈⟨ pullˡ is-refl₁ ⟩
@@ -167,7 +165,7 @@ module _ where
                                    id ∘ x          ≈⟨ identityˡ ⟩
                                    x               ≈⟨ eq ⟩
                                    y               ∎) }
-               ; trans = λ { {i} {j} {k} (l , eqi , eqj₁) (r , eqj₂ , eqk) →
+    ; trans = λ { {_} {i} {j} {k} (l , eqi , eqj₁) (r , eqj₂ , eqk) →
                              trans ∘ universal R×R {_} {r} {l} (𝒞≈.trans eqj₂ (𝒞≈.sym eqj₁))
                            , (begin
                                R.p₁ ∘ trans ∘ R×R.universal _    ≈⟨ pullˡ is-trans₁ ⟩
@@ -179,7 +177,6 @@ module _ where
                                (R.p₂ ∘ R×R.p₁) ∘ R×R.universal _ ≈⟨ pullʳ (p₁∘universal≈h₁ R×R) ⟩
                                R.p₂ ∘ r                          ≈⟨ eqk ⟩
                                k                                 ∎) }
-               }
     ; ∘-resp-⊑ = λ { {_} {_} {f} {g} {h} (p , eqg , eqh) → p ∘ f , pullˡ eqg , pullˡ eqh }
     }
     where
