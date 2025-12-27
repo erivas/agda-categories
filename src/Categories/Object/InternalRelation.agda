@@ -117,21 +117,21 @@ module _ where
   KP⇒Equivalence f kp pb = record { R = KP⇒Relation f kp ; eqspan = KP⇒EqSpan f kp pb }
 
 
-record PreordSpan {X R : 𝒞.Obj} (f : R ⇒ X) (g : R ⇒ X) : Set (suc (o ⊔ ℓ ⊔ e)) where
+record PreordSpan {X R : 𝒞.Obj} (f : R 𝒞.⇒ X) (g : R 𝒞.⇒ X) : Set (suc (o ⊔ ℓ ⊔ e)) where
   field
      R×R : Pullback 𝒞 f g
 
   module R×R = Pullback R×R renaming (P to dom)
 
   field
-     refl  : X ⇒ R
-     trans : R×R.dom ⇒ R
+     refl  : X 𝒞.⇒ R
+     trans : R×R.dom 𝒞.⇒ R
 
-     is-refl₁ : f ∘ refl ≈ id
-     is-refl₂ : g ∘ refl ≈ id
+     is-refl₁ : f 𝒞.∘ refl 𝒞.≈ 𝒞.id
+     is-refl₂ : g 𝒞.∘ refl 𝒞.≈ 𝒞.id
 
-     is-trans₁ : f ∘ trans ≈ f ∘ R×R.p₂
-     is-trans₂ : g ∘ trans ≈ g ∘ R×R.p₁
+     is-trans₁ : f 𝒞.∘ trans 𝒞.≈ f 𝒞.∘ R×R.p₂
+     is-trans₂ : g 𝒞.∘ trans 𝒞.≈ g 𝒞.∘ R×R.p₁
 
 -- Internal Preorder
 -- (https://ncatlab.org/nlab/show/preordered+object)
@@ -153,31 +153,31 @@ module _ where
   -- from an internal preorder we can obtain an external one
   IP⇒EP : {X : 𝒞.Obj} (ipreorder : Preorder X) → ExternallyPreordered {i = ℓ ⊔ e} 𝒞 X
   IP⇒EP {X} ip = record
-    { _⊑_ = λ {A} f g → ∃ (λ p → R.p₁ ∘ p ≈ f × R.p₂ ∘ p ≈ g)
+    { _⊑_ = λ {A} f g → ∃ (λ p → R.p₁ 𝒞.∘ p 𝒞.≈ f × R.p₂ 𝒞.∘ p 𝒞.≈ g)
     ; reflexive = λ { {_} {x} {y} eq →
-                                 refl ∘ x
+                                 refl 𝒞.∘ x
                                , (begin
-                                   R.p₁ ∘ refl ∘ x ≈⟨ pullˡ is-refl₁ ⟩
-                                   id ∘ x          ≈⟨ identityˡ ⟩
+                                   R.p₁ 𝒞.∘ refl 𝒞.∘ x ≈⟨ pullˡ is-refl₁ ⟩
+                                   𝒞.id 𝒞.∘ x          ≈⟨ identityˡ ⟩
                                    x               ∎)
                                , (begin
-                                   R.p₂ ∘ refl ∘ x ≈⟨ pullˡ is-refl₂ ⟩
-                                   id ∘ x          ≈⟨ identityˡ ⟩
+                                   R.p₂ 𝒞.∘ refl 𝒞.∘ x ≈⟨ pullˡ is-refl₂ ⟩
+                                   𝒞.id 𝒞.∘ x          ≈⟨ identityˡ ⟩
                                    x               ≈⟨ eq ⟩
                                    y               ∎) }
     ; trans = λ { {_} {i} {j} {k} (l , eqi , eqj₁) (r , eqj₂ , eqk) →
-                             trans ∘ universal R×R {_} {r} {l} (𝒞≈.trans eqj₂ (𝒞≈.sym eqj₁))
+                             trans 𝒞.∘ universal R×R {_} {r} {l} (𝒞≈.trans eqj₂ (𝒞≈.sym eqj₁))
                            , (begin
-                               R.p₁ ∘ trans ∘ R×R.universal _    ≈⟨ pullˡ is-trans₁ ⟩
-                               (R.p₁ ∘ R×R.p₂) ∘ R×R.universal _ ≈⟨ pullʳ (p₂∘universal≈h₂ R×R) ⟩
-                               R.p₁ ∘ l                          ≈⟨ eqi ⟩
+                               R.p₁ 𝒞.∘ trans 𝒞.∘ R×R.universal _    ≈⟨ pullˡ is-trans₁ ⟩
+                               (R.p₁ 𝒞.∘ R×R.p₂) 𝒞.∘ R×R.universal _ ≈⟨ pullʳ (p₂∘universal≈h₂ R×R) ⟩
+                               R.p₁ 𝒞.∘ l                          ≈⟨ eqi ⟩
                                i                                 ∎)
                            , (begin
-                               R.p₂ ∘ trans ∘ R×R.universal _    ≈⟨ pullˡ is-trans₂ ⟩
-                               (R.p₂ ∘ R×R.p₁) ∘ R×R.universal _ ≈⟨ pullʳ (p₁∘universal≈h₁ R×R) ⟩
-                               R.p₂ ∘ r                          ≈⟨ eqk ⟩
+                               R.p₂ 𝒞.∘ trans 𝒞.∘ R×R.universal _    ≈⟨ pullˡ is-trans₂ ⟩
+                               (R.p₂ 𝒞.∘ R×R.p₁) 𝒞.∘ R×R.universal _ ≈⟨ pullʳ (p₁∘universal≈h₁ R×R) ⟩
+                               R.p₂ 𝒞.∘ r                          ≈⟨ eqk ⟩
                                k                                 ∎) }
-    ; ∘-resp-⊑ = λ { {_} {_} {f} {g} {h} (p , eqg , eqh) → p ∘ f , pullˡ eqg , pullˡ eqh }
+    ; ∘-resp-⊑ = λ { {_} {_} {f} {g} {h} (p , eqg , eqh) → p 𝒞.∘ f , pullˡ eqg , pullˡ eqh }
     }
     where
     open 𝒞.HomReasoning

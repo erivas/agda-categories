@@ -4,17 +4,17 @@
 
 module Categories.Monad.Preordered  where
 
-open import Level
+open import Level using (Level; _⊔_; suc)
 open import Relation.Binary using (IsPreorder)
 
-open import Categories.Category
-open import Categories.Category.Monoidal
-open import Categories.Functor
-open import Categories.NaturalTransformation hiding (id)
-open import Categories.Monad hiding (id)
-open import Categories.Functor.Preordered
-open import Categories.Functor.Monoidal
-open import Categories.Category.Construction.Kleisli
+open import Categories.Category using (Category)
+open import Categories.Category.Monoidal using (Monoidal)
+open import Categories.Functor using (Functor)
+open import Categories.NaturalTransformation using (NaturalTransformation)
+open import Categories.Monad using (Monad)
+open import Categories.Functor.Preordered using (HasPreorder)
+open import Categories.Functor.Monoidal using (MonoidalFunctor)
+open import Categories.Category.Construction.Kleisli using (Kleisli)
 
 private
   variable
