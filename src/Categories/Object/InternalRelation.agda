@@ -19,6 +19,7 @@ open import Categories.Diagram.Pullback using (Pullback)
 open import Categories.Diagram.KernelPair using (KernelPair)
 open import Categories.Category.Cartesian using (Cartesian)
 open import Categories.Object.Preordered renaming (Preordered to ExternallyPreordered)
+open import Categories.Object.PartiallyOrdered renaming (PartiallyOrdered to ExternallyPartiallyOrdered)
 
 open import Categories.Category.BinaryProducts 𝒞 using (BinaryProducts; module BinaryProducts)
 
@@ -26,7 +27,7 @@ private
   module 𝒞 = Category 𝒞
 
 open Category 𝒞
-open Mor 𝒞 using (JointMono)
+open Mor 𝒞 using (JointMono; Mono)
 
 -- A relation is a span, "which is (-1)-truncated as a morphism into the cartesian product."
 -- (https://ncatlab.org/nlab/show/span#correspondences)
@@ -184,3 +185,93 @@ module _ where
     open MR 𝒞
     open Preorder ip
     open PreordSpan preordspan
+
+
+record PartialordSpan {X R : 𝒞.Obj} (f : R 𝒞.⇒ X) (g : R 𝒞.⇒ X) : Set (suc (o ⊔ ℓ ⊔ e)) where
+  field
+     R×R : Pullback 𝒞 f g
+     R×Rᵒ : Pullback 𝒞 g f
+
+  module R×R = Pullback R×R renaming (P to dom)
+  module R×Rᵒ = Pullback R×Rᵒ renaming (P to dom)
+
+  field
+     refl  : X 𝒞.⇒ R
+     trans : R×R.dom 𝒞.⇒ R
+     antisym : R×Rᵒ.dom 𝒞.⇒ X
+
+     is-refl₁ : f 𝒞.∘ refl 𝒞.≈ 𝒞.id
+     is-refl₂ : g 𝒞.∘ refl 𝒞.≈ 𝒞.id
+
+     is-trans₁ : f 𝒞.∘ trans 𝒞.≈ f 𝒞.∘ R×R.p₂
+     is-trans₂ : g 𝒞.∘ trans 𝒞.≈ g 𝒞.∘ R×R.p₁
+
+     is-antisym-1 : f 𝒞.∘ R×Rᵒ.p₁ 𝒞.≈ antisym
+     is-antisym-mid : g 𝒞.∘ R×Rᵒ.p₁ 𝒞.≈ antisym
+     is-antisym-2 : g 𝒞.∘ R×Rᵒ.p₂ 𝒞.≈ antisym
+
+-- Internal Partial Order
+-- (https://ncatlab.org/nlab/show/partially+ordered+object)
+record PartialOrder (X : 𝒞.Obj) : Set (suc (o ⊔ ℓ ⊔ e)) where
+  field
+     R : Relation X X
+
+  module R = Relation R
+
+  field
+    partialordspan : PartialordSpan R.p₁ R.p₂
+
+
+module _ where
+  open Pullback hiding (P)
+  private
+    module 𝒞≈ = 𝒞.Equiv
+
+  -- from an internal partial order we can obtain an external one
+  IPO⇒EPO : {X : 𝒞.Obj} (ipartialorder : PartialOrder X) → ExternallyPartiallyOrdered {i = ℓ ⊔ e} 𝒞 X
+  IPO⇒EPO {X} ipo = let module IPO = PartialOrder ipo
+                        open IPO using (R; partialordspan)
+                        module R = Relation R
+                        module POS = PartialordSpan partialordspan
+                        open MR 𝒞
+                    in record
+    { _⊑_ = λ {A} f g → ∃ (λ p → R.p₁ 𝒞.∘ p 𝒞.≈ f × R.p₂ 𝒞.∘ p 𝒞.≈ g)
+    ; reflexive = λ { {_} {x} {y} eq →
+                                 let open 𝒞.HomReasoning
+                                 in POS.refl 𝒞.∘ x
+                               , (begin
+                                   R.p₁ 𝒞.∘ POS.refl 𝒞.∘ x ≈⟨ pullˡ POS.is-refl₁ ⟩
+                                   𝒞.id 𝒞.∘ x          ≈⟨ identityˡ ⟩
+                                   x               ∎)
+                               , (begin
+                                   R.p₂ 𝒞.∘ POS.refl 𝒞.∘ x ≈⟨ pullˡ POS.is-refl₂ ⟩
+                                   𝒞.id 𝒞.∘ x          ≈⟨ identityˡ ⟩
+                                   x               ≈⟨ eq ⟩
+                                   y               ∎) }
+    ; antisym = λ { {_} {i} {j} (f , eqi₁ , eqj₁) (g , eqj₂ , eqi₂) →
+                             let open 𝒞.HomReasoning
+                                 comm = 𝒞≈.trans eqj₁ (𝒞≈.sym eqj₂)
+                                 u = universal POS.R×Rᵒ {_} {f} {g} comm
+                             in begin
+                               i                                     ≈˘⟨ eqi₁ ⟩
+                               R.p₁ 𝒞.∘ f                            ≈˘⟨ refl⟩∘⟨ p₁∘universal≈h₁ POS.R×Rᵒ ⟩
+                               R.p₁ 𝒞.∘ Pullback.p₁ POS.R×Rᵒ 𝒞.∘ u   ≈⟨ pullˡ POS.is-antisym-1 ⟩
+                               POS.antisym 𝒞.∘ u                      ≈˘⟨ pullˡ POS.is-antisym-mid ⟩
+                               (R.p₂ 𝒞.∘ Pullback.p₁ POS.R×Rᵒ) 𝒞.∘ u  ≈⟨ pullʳ (p₁∘universal≈h₁ POS.R×Rᵒ) ⟩
+                               R.p₂ 𝒞.∘ f                            ≈⟨ eqj₁ ⟩
+                               j                                     ∎ }
+    ; trans = λ { {_} {i} {j} {k} (l , eqi , eqj₁) (r , eqj₂ , eqk) →
+                             let open 𝒞.HomReasoning in
+                             POS.trans 𝒞.∘ universal POS.R×R {_} {r} {l} (𝒞≈.trans eqj₂ (𝒞≈.sym eqj₁))
+                           , (begin
+                               R.p₁ 𝒞.∘ POS.trans 𝒞.∘ universal POS.R×R _ ≈⟨ pullˡ POS.is-trans₁ ⟩
+                               (R.p₁ 𝒞.∘ Pullback.p₂ POS.R×R) 𝒞.∘ universal POS.R×R _ ≈⟨ pullʳ (p₂∘universal≈h₂ POS.R×R) ⟩
+                               R.p₁ 𝒞.∘ l                          ≈⟨ eqi ⟩
+                               i                                 ∎)
+                           , (begin
+                               R.p₂ 𝒞.∘ POS.trans 𝒞.∘ universal POS.R×R _    ≈⟨ pullˡ POS.is-trans₂ ⟩
+                               (R.p₂ 𝒞.∘ Pullback.p₁ POS.R×R) 𝒞.∘ universal POS.R×R _ ≈⟨ pullʳ (p₁∘universal≈h₁ POS.R×R) ⟩
+                               R.p₂ 𝒞.∘ r                          ≈⟨ eqk ⟩
+                               k                                 ∎) }
+    ; ∘-resp-⊑ = λ { {_} {_} {f} {g} {h} (p , eqg , eqh) → p 𝒞.∘ f , pullˡ eqg , pullˡ eqh }
+    }
